@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+    <string name="action_settings">Settings</string>
+    <string name="add_text">Add</string>
+    <string name="app_name">Database</string>
+    <string name="delete_text">Delete</string>
+    <string name="find_text">Find</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="id_not_set">ID not assigned</string>
+    <string name="id_text">Product ID</string>
+    <string name="name_text">Product Name</string>
+    <string name="quantity_text">Product Quantity</string>
+    <style name="AppBaseTheme" parent="android:Theme.Light">
+        <!--
+            Theme customizations available in newer API levels can go in
+            res/values-vXX/styles.xml, while customizations related to
+            backward-compatibility can go here.
+        -->
+    </style>
+    <style name="AppTheme" parent="AppBaseTheme">
+        <!-- All customizations that are NOT specific to a particular API-level can go here. -->
+    </style>
+</resources>
