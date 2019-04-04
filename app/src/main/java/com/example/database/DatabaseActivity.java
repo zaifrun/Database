@@ -2,9 +2,12 @@ package com.example.database;
 
 import android.os.Bundle;
 import android.app.Activity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.TextView;
 
 public class DatabaseActivity extends Activity {
@@ -12,14 +15,27 @@ public class DatabaseActivity extends Activity {
 	TextView idView;
 	EditText productBox;
 	EditText quantityBox;
+	ArrayAdapter<Product> adapter;
+
+
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_database);
-        idView = (TextView) findViewById(R.id.productID);
-        productBox = (EditText) findViewById(R.id.productName);
-        quantityBox = (EditText) findViewById(R.id.productQuantity);
+        idView = findViewById(R.id.productID);
+        productBox = findViewById(R.id.productName);
+        quantityBox = findViewById(R.id.productQuantity);
+
+        DataBase db = new DataBase(this);
+		adapter = new ArrayAdapter<Product>(this,
+				android.R.layout.simple_list_item_1,db.getAllProducts());
+
+		final ListView listView = findViewById(R.id.productList);
+
+		//only allow one element to be selected at the same time
+		listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+		listView.setAdapter(adapter);
 	}
 
 	//onClickListener for the "New" product button
@@ -38,6 +54,8 @@ public class DatabaseActivity extends Activity {
 	   dbHandler.addProduct(product);
 	   productBox.setText(""); //reset the box
 	   quantityBox.setText(""); //reset the box
+	   adapter.add(product);
+
   }
 
   public void lookupProduct (View view) {
@@ -51,23 +69,29 @@ public class DatabaseActivity extends Activity {
 		   
           quantityBox.setText(String.valueOf(product.getQuantity()));
        } else {
-	         idView.setText("No Match Found");
+	         idView.setText(getString(R.string.no_match_found));
        }        	
    }
 
    public void removeProduct (View view) {
 	    DataBase dbHandler = new DataBase(this);
 	
-	     boolean result = dbHandler.deleteProduct(productBox.getText().toString());
+	     Product p = dbHandler.deleteProduct(productBox.getText().toString());
 
-	     if (result)
+	     //did we find something that matches
+	     if (p!=null)
 	     {
-		     idView.setText("Record Deleted");
+	     	 Log.d("product_removed",p.toString());
+		     idView.setText(getString(R.string.record_deleted));
 		     productBox.setText("");
 		     quantityBox.setText("");
+		     int pos = adapter.getPosition(p);
+		     Log.d("item_position","pos : "+pos);
+		     adapter.remove(p);
+		     adapter.notifyDataSetChanged();
 	     }
          else
-	          idView.setText("No Match Found");        	
+	          idView.setText(R.string.no_match_found);
    	}
 
 	

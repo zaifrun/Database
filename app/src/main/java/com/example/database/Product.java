@@ -1,12 +1,38 @@
 package com.example.database;
 
+import java.util.Objects;
+
 public class Product {
 	
 	//just an ID number, to distinguish products with the same name from
 	//each other.
-	private int id;
+	private long id;
 	private String productname;
 	private int quantity;
+
+	@Override
+	public String toString() {
+		return "Product{" +
+				"id=" + id +
+				", productname='" + productname + '\'' +
+				", quantity=" + quantity +
+				'}';
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		Product product = (Product) o;
+		return id == product.id &&
+				getQuantity() == product.getQuantity() &&
+				Objects.equals(productname, product.productname);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(id, productname, getQuantity());
+	}
 
 	public Product() {
 		
@@ -23,11 +49,11 @@ public class Product {
 		this.quantity = quantity;
 	}
 	
-	public void setID(int id) {
+	public void setID(long id) {
 		this.id = id;
 	}
 	
-	public int getID() {
+	public long getID() {
 		return this.id;
 	}
 	

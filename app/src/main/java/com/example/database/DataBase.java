@@ -6,6 +6,8 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 
+import java.util.ArrayList;
+
 public class DataBase extends SQLiteOpenHelper {
 
 	//normally put it to 1, but I changed something
@@ -24,9 +26,9 @@ public class DataBase extends SQLiteOpenHelper {
 	private static final String TABLE_PRODUCTS = "products";
 	
 	//We will have 3 columns in this table
-	public static final String COLUMN_ID = "id";
-	public static final String COLUMN_PRODUCTNAME = "productname";
-	public static final String COLUMN_QUANTITY = "quantity";
+	private static final String COLUMN_ID = "id";
+	private static final String COLUMN_PRODUCTNAME = "productname";
+	private static final String COLUMN_QUANTITY = "quantity";
 	
 	//constructor - will simply call our super class
 	public DataBase(Context context) {
@@ -57,6 +59,28 @@ public class DataBase extends SQLiteOpenHelper {
 		onCreate(db);
 	}
 
+
+	public ArrayList<Product> getAllProducts()
+	{
+		ArrayList<Product> list = new ArrayList<>();
+
+		SQLiteDatabase db = getReadableDatabase();
+		Cursor cursor;
+		cursor = db.rawQuery("SELECT * FROM "+TABLE_PRODUCTS+" ORDER BY id ASC",null);
+		while (cursor.moveToNext())
+		{
+			int id = cursor.getInt(cursor.getColumnIndex(COLUMN_ID));
+			int quantity = cursor.getInt(cursor.getColumnIndex(COLUMN_QUANTITY));
+			String name = cursor.getString(cursor.getColumnIndex(COLUMN_PRODUCTNAME));
+			Product p = new Product(id,name,quantity);
+			list.add(p);
+		}
+		cursor.close();
+		db.close();
+
+		return list;
+	}
+
 	//Method for adding a product to our database.
 	public void addProduct(Product product) {
 
@@ -73,9 +97,13 @@ public class DataBase extends SQLiteOpenHelper {
         
         //inserting our new data into the database
         //dont worry about the second "null" parameter!
-        db.insert(TABLE_PRODUCTS, null, values);
+        long id = db.insert(TABLE_PRODUCTS, null, values);
+        product.setID(id);
         db.close(); //remember to always close our database
 	}
+
+
+
 
 	//Find a specific product in our database and
 	//return it (or null if it does not exists)
@@ -120,33 +148,34 @@ public class DataBase extends SQLiteOpenHelper {
 	}
 	
 	//delete the product with the given name
-	public boolean deleteProduct(String productname) {
+	//returns the product deleted - null if not found
+	public Product deleteProduct(String productname) {
 		
-		//we will return true if we deleted something,
-		//false otherwise.
-		boolean result = false;		
+
 		String query = "Select * FROM " + TABLE_PRODUCTS + " WHERE " + 
 						COLUMN_PRODUCTNAME + " =  \"" + productname + "\"";
 		SQLiteDatabase db = getWritableDatabase();
 		//make a SQL query
 		Cursor cursor = db.rawQuery(query, null);
 		
-		Product product = new Product();
+		Product product = null;
 		
 		//did we find a product?
 		if (cursor.moveToFirst()) {
-			int id = cursor.getInt(0);
-			product.setID(id);
+			int id = cursor.getInt(cursor.getColumnIndex(COLUMN_ID));
+			int quantity = cursor.getInt(cursor.getColumnIndex(COLUMN_QUANTITY));
+			String name = cursor.getString(cursor.getColumnIndex(COLUMN_PRODUCTNAME));
+			product = new Product(id,name,quantity);
+
 			//delete products where the columns_id matches the 
 			//id for this product name
 			//NOTICE THE ? MARK WILL BE REPLACED BY OUR ID NUMBER
 			db.delete(TABLE_PRODUCTS, COLUMN_ID + " = ?",
 		            new String[] { String.valueOf(id) });
 			cursor.close();
-			result = true; //we did find something we could delete!
 		}
 		db.close(); //close the database
-		return result;
+		return product;
 	}
 
 }

@@ -11,5 +11,7 @@
     <string name="add_text">Add</string>
     <string name="find_text">Find</string>
     <string name="delete_text">Delete</string>
+    <string name="no_match_found">No Match Found</string>
+    <string name="record_deleted">Record Deleted</string>
 
 </resources>
